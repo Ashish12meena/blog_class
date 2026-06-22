@@ -1,9 +1,12 @@
 package com.wordle.blog.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,26 +32,17 @@ public class UserController {
     }
 
     @PostMapping
-    public void createUser(@Valid @RequestBody CreateUserRequestDto request) {
-        userService.createUser(request);
+    public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody CreateUserRequestDto request) {
+        UserResponseDTO response = userService.createUser(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+
     }
 
-    @GetMapping
-    public ResponseEntity<Page<UserResponseDTO>> getAllUsers(
-            @RequestParam(required = false) Boolean isActive,
-            @RequestParam(required = false) Role role,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction) {
-        size = Math.min(size, 100); // defensive clamp
+    @GetMapping("/all")
+    public List<UserResponseDTO> getAllUsers() {
 
-        Sort sort = direction.equalsIgnoreCase("desc")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+        List<UserResponseDTO> userResponseDTOs = userService.getAllUsers();
+        return userResponseDTOs;
 
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<UserResponseDTO> result = userService.getUsers(isActive, role, pageable);
-        return ResponseEntity.ok(result);
     }
 }
