@@ -28,6 +28,6 @@ public interface UserRepository extends JpaRepository<User,Long>{
 
      boolean existsByUsername(String username);
 
-     @Query("select * from User")
-     List<UserResponseDTO> findAllByProjection();
+     // @Query("select * from User")
+     // List<UserResponseDTO> findAllByProjection();
 }
