@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import com.wordle.blog.dto.CreateUserRequestDto;
 import com.wordle.blog.dto.UserResponseDTO;
 import com.wordle.blog.enitity.User;
+import com.wordle.blog.enums.Role;
 
 @Component
-
 public class UserMapper {
     public User mapCreateUserDtoRequesttoUser(CreateUserRequestDto request) {
         return User.builder()
@@ -18,6 +18,7 @@ public class UserMapper {
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(request.getPassword())
+                .role(Role.valueOf(request.getRole()))
                 .build();
 
     }

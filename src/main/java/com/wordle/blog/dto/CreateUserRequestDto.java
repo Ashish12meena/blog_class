@@ -1,5 +1,7 @@
 package com.wordle.blog.dto;
 
+import java.util.StringTokenizer;
+
 import com.wordle.blog.enums.Role;
 
 import jakarta.validation.constraints.Email;
@@ -33,5 +35,5 @@ public class CreateUserRequestDto {
     private String bio;
 
     @NotBlank(message = "Role is required")
-    private Role role;
+    private String role;
 }
