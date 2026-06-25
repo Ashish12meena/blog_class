@@ -46,4 +46,5 @@ public class Follow {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+  
 }

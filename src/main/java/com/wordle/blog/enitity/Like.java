@@ -43,4 +43,5 @@ public class Like {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+  
 }
