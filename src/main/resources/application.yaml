@@ -2,11 +2,16 @@ spring:
   application:
     name: wordle
 
+  profiles:
+    include:
+      - redis
+      - dev
+
   # Database Configuration
   datasource:
     url: jdbc:mysql://localhost:3306/blog
     username: root
-    password: 
+    password: meenagaming12@#
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   # Hibernate & MySQL Dialect Configuration
@@ -52,10 +57,10 @@ media:
     base-url: http://localhost:8080/media
 
   s3:
-    bucket-name: your-bucket-name
+    bucket-name: bloggera-image
     # Public URL prefix for S3 objects. Standard virtual-hosted-style format:
     # https://<bucket-name>.s3.<region>.amazonaws.com
-    base-url: https://your-bucket-name.s3.amazonaws.com
+    base-url: https://bloggera-image.s3.amazonaws.com
 
 # ---------------------------------------------------------------------------
 # AWS Credentials — only read if/when S3StorageStrategy's S3Client bean
@@ -67,6 +72,11 @@ cloud:
     region:
       static: ap-south-1
     credentials:
-      access-key: ${AWS_ACCESS_KEY:}
-      secret-key: ${AWS_SECRET_KEY:}
+      access-key: ${AWS_ACCESS_KEY:020028129526}
+      secret-key: ${AWS_SECRET_KEY:cBLrHm3syH1lz9+ak1vyUMnPPOOOMHFNik9u8Qml}
 
+
+jwt:
+  secret: "ChangeThisToALongRandomBase64SecretAtLeast256BitsForHS256Algorithm"
+  access-token-expiration-ms: 3600000      # 1 hour
+  refresh-token-expiration-ms: 2592000000  # 30 days

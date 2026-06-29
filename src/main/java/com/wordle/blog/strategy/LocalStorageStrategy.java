@@ -4,6 +4,7 @@ import com.wordle.blog.enums.StorageType;
 import com.wordle.blog.exception.MediaUploadException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -11,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
-
 
 // ̥
 //  * Stores files on the local filesystem.
@@ -25,13 +25,14 @@ import java.util.UUID;
 //  *
 @Slf4j
 @Component
+@Primary
 public class LocalStorageStrategy implements StorageStrategy {
 
     @Value("${media.local.base-path}")
-    private String basePath;  //./upload/media
+    private String basePath; // ./upload/media
 
     @Value("${media.local.base-url}")
-    private String baseUrl;  //http://localhost:8080/media
+    private String baseUrl; // http://localhost:8080/media
 
     @Override
     public StorageResult upload(MultipartFile file) {
@@ -41,7 +42,6 @@ public class LocalStorageStrategy implements StorageStrategy {
                 Files.createDirectories(uploadDir);
                 log.info("Created local media directory at {}", uploadDir.toAbsolutePath());
             }
-
 
             // UUID prefix guarantees uniqueness even if two users upload a
             // file with the exact same original name at the exact same time.
@@ -92,7 +92,8 @@ public class LocalStorageStrategy implements StorageStrategy {
      * server-side path.
      */
     private String sanitize(String fileName) {
-        if (fileName == null) return "file";
+        if (fileName == null)
+            return "file";
         return fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
     }
 }

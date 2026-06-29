@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -24,7 +25,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
             group by l.post.id, l.post.title
             order by count(l.id) desc
             """)
-    java.util.List<MostLikedProjection> findMostLikedPostsByUser(@Param("userId") Long userId);
+    List<MostLikedProjection> findMostLikedPostsByUser(@Param("userId") Long userId);
 
     interface MostLikedProjection {
         Long getPostId();

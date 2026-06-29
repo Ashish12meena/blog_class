@@ -1,11 +1,8 @@
 package com.wordle.blog.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+// import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.wordle.blog.dto.CreateUserRequestDto;
@@ -17,17 +14,15 @@ import com.wordle.blog.exception.UsernameAlreadyExist;
 import com.wordle.blog.mapper.UserMapper;
 import com.wordle.blog.repository.UserRepository;
 
-import ch.qos.logback.core.util.COWArrayList;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    UserRepository usrRepo;
-    UserMapper userMapper;
-
-    UserService(UserRepository userRepository) {
-        this.usrRepo = userRepository;
-    }
+    private final UserRepository usrRepo;
+    private final UserMapper userMapper;
+    // private final PasswordEncoder passwordEncoder;
 
     public void findById(Long id) {
         User user = usrRepo.findById(id).orElseThrow(() -> new UserNotFoundException("user not found at id:" + id));
@@ -39,6 +34,8 @@ public class UserService {
         if (isEmailAlreadyExist(request.getEmail()) || isUsernameExist(request.getUsername())) {
             throw new UsernameAlreadyExist("user with this username" + request.getUsername() + " already exist");
         }
+        // String hashedPassword = passwordEncoder.encode(request.getPassword());
+        // request.setPassword(hashedPassword);
         User user = userMapper.mapCreateUserDtoRequesttoUser(request);
         return userMapper.toResponseDTO(usrRepo.save(user));
     }
@@ -67,14 +64,13 @@ public class UserService {
         return userPage.map(userMapper::toResponseDTO);
     }
 
-    public List<UserResponseDTO> getAllUsers() {
-    //     List<User> users = usrRepo.findAll();
+    // public List<UserResponseDTO> getAllUsers() {
+    // // List<User> users = usrRepo.findAll();
 
-    //    return  userMapper.mapListOfEntityToListOfUserResponseDto(users);
+    // // return userMapper.mapListOfEntityToListOfUserResponseDto(users);
 
-    return usrRepo.findAllByProjection();
+    // // return usrRepo.findAllByProjection();
 
-       
-    }
+    // }
 
 }
