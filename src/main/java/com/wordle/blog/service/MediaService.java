@@ -1,5 +1,6 @@
 package com.wordle.blog.service;
 
+import com.wordle.blog.dto.LoadedFile;
 import com.wordle.blog.dto.MediaResponseDTO;
 import com.wordle.blog.enitity.Media;
 import com.wordle.blog.enums.StorageType;
@@ -7,10 +8,15 @@ import com.wordle.blog.exception.MediaNotFoundException;
 import com.wordle.blog.exception.MediaUploadException;
 import com.wordle.blog.mapper.MediaMapper;
 import com.wordle.blog.repository.MediaRepository;
+import com.wordle.blog.strategy.LoadLocalStorage;
 import com.wordle.blog.strategy.StorageResult;
 import com.wordle.blog.strategy.StorageStrategy;
 import com.wordle.blog.strategy.StorageStrategyResolver;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,11 +33,13 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MediaService {
 
     private final MediaRepository mediaRepository;
     private final MediaMapper mediaMapper;
     private final StorageStrategyResolver storageStrategyResolver;
+    private final LoadLocalStorage loadLocalStorage;
 
     /**
      * The default backend to use when a caller doesn't explicitly specify
@@ -42,13 +50,6 @@ public class MediaService {
     @Value("${media.default-storage-type}")
     private StorageType defaultStorageType;
 
-    public MediaService(MediaRepository mediaRepository,
-                         MediaMapper mediaMapper,
-                         StorageStrategyResolver storageStrategyResolver) {
-        this.mediaRepository = mediaRepository;
-        this.mediaMapper = mediaMapper;
-        this.storageStrategyResolver = storageStrategyResolver;
-    }
 
     @Transactional
     public MediaResponseDTO upload(MultipartFile file) {
@@ -118,5 +119,9 @@ public class MediaService {
                     log.warn("Media not found for id {}", id);
                     return new MediaNotFoundException("Media not found at id: " + id);
                 });
+    }
+
+    public LoadedFile loadLocalFile(String filename) {
+         return loadLocalStorage.loadFile(filename);
     }
 }

@@ -1,11 +1,16 @@
 package com.wordle.blog.controller;
 
+import com.wordle.blog.dto.LoadedFile;
 import com.wordle.blog.dto.MediaResponseDTO;
 import com.wordle.blog.enums.StorageType;
 import com.wordle.blog.service.MediaService;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,19 +38,33 @@ public class MediaController {
 
         log.info("Received upload request for file '{}'", file.getOriginalFilename());
 
-        MediaResponseDTO response = storageType == null ? mediaService.upload(file) : mediaService.upload(file, storageType);
+        MediaResponseDTO response = storageType == null ? mediaService.upload(file)
+                : mediaService.upload(file, storageType);
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<MediaResponseDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(mediaService.getById(id));
-    }
+    // @GetMapping("/{id}")
+    // public ResponseEntity<MediaResponseDTO> getById(@PathVariable Long id) {
+    //     return ResponseEntity.ok(mediaService.getById(id));
+    // }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         mediaService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{filename:.+}")
+    public ResponseEntity<Resource> serveLocalFile(@PathVariable String filename) {
+        log.info("Serving local media file '{}'", filename);
+
+        LoadedFile loadedFile = mediaService.loadLocalFile(filename);
+
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(loadedFile.contentType()))
+                .header(HttpHeaders.CACHE_CONTROL, "public, max-age=86400")
+                .body(loadedFile.resource());
     }
 }

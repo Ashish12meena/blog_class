@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wordle.blog.dto.CreateTagRequestDto;
-import com.wordle.blog.dto.GetTagDto;
 import com.wordle.blog.dto.TagResponseDTO;
 import com.wordle.blog.service.TagService;
 

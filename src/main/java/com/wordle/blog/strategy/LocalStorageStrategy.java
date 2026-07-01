@@ -1,13 +1,18 @@
 package com.wordle.blog.strategy;
 
+import com.wordle.blog.dto.LoadedFile;
 import com.wordle.blog.enums.StorageType;
+import com.wordle.blog.exception.MediaNotFoundException;
 import com.wordle.blog.exception.MediaUploadException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,7 +31,7 @@ import java.util.UUID;
 @Slf4j
 @Component
 @Primary
-public class LocalStorageStrategy implements StorageStrategy {
+public class LocalStorageStrategy implements StorageStrategy , LoadLocalStorage {
 
     @Value("${media.local.base-path}")
     private String basePath; // ./upload/media
@@ -96,4 +101,43 @@ public class LocalStorageStrategy implements StorageStrategy {
             return "file";
         return fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
     }
+
+    @Override
+    public LoadedFile loadFile(String filename) {
+        Path baseDir = Paths.get(basePath).toAbsolutePath().normalize();
+        Path filePath = baseDir.resolve(filename).normalize();
+
+        if (!filePath.startsWith(baseDir)) {
+            log.warn("Rejected path traversal attempt for filename '{}'", filename);
+            throw new MediaNotFoundException("Invalid file path: " + filename);
+        }
+
+        Resource resource;
+        try {
+            resource = new UrlResource(filePath.toUri());
+        } catch (MalformedURLException e) {
+            throw new MediaNotFoundException("Invalid file path: " + filename);
+        }
+
+        if (!resource.exists() || !resource.isReadable()) {
+            log.warn("Requested local file not found or unreadable: '{}'", filename);
+            throw new MediaNotFoundException("File not found: " + filename);
+        }
+
+        String contentType;
+        try {
+            contentType = Files.probeContentType(filePath);
+        } catch (IOException e) {
+            contentType = null;
+        }
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        
+
+        return new LoadedFile(resource, contentType);
+    }
+
+    
 }

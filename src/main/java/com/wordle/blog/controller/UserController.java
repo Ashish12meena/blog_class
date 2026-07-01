@@ -1,35 +1,45 @@
 package com.wordle.blog.controller;
 
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.wordle.blog.dto.CreateUserRequestDto;
+import com.wordle.blog.dto.UpdateUserRequestDto;
 import com.wordle.blog.dto.UserResponseDTO;
+import com.wordle.blog.enums.Role;
 import com.wordle.blog.service.UserService;
-
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/user")
+@RequestMapping("/api/user")
+@RequiredArgsConstructor
 public class UserController {
-    UserService userService;
 
-    UserController(UserService userService) {
-        this.userService = userService;
+    private final UserService userService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.findById(id));
     }
 
-    
+    @GetMapping("/username/{username}")
+    public ResponseEntity<UserResponseDTO> getByUsername(@PathVariable String username) {
+        return ResponseEntity.ok(userService.findByUsername(username));
+    }
 
-    // @GetMapping("/all")
-    // public List<UserResponseDTO> getAllUsers() {
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserRequestDto request) {
+        return ResponseEntity.ok(userService.updateUser(id, request));
+    }
 
-    //     List<UserResponseDTO> userResponseDTOs = userService.getAllUsers();
-    //     return userResponseDTOs;
-
-    // }
+    @GetMapping
+    public ResponseEntity<Page<UserResponseDTO>> getUsers(
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(required = false) Role role,
+            Pageable pageable) {
+        return ResponseEntity.ok(userService.getUsers(isActive, role, pageable));
+    }
 }

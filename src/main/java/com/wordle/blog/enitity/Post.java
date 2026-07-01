@@ -38,6 +38,10 @@ public class Post {
     @Column(name = "view_count", nullable = false)
     private Long viewCount = 0L;
 
+    @Builder.Default
+    @Column(name = "comment_count", nullable = false)
+    private Long commentCount = 0L;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;

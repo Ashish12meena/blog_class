@@ -54,7 +54,7 @@ media:
     # Prefix used to build the public URL returned to clients.
     # Requires a static resource handler (see note below) to actually
     # serve files from base-path at this URL.
-    base-url: http://localhost:8080/media
+    base-url: http://localhost:8080/api/media
 
   s3:
     bucket-name: bloggera-image
