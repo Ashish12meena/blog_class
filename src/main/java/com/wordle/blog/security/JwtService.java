@@ -5,12 +5,16 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Owns everything related to creating and reading JWT ACCESS tokens.
@@ -82,5 +86,20 @@ public class JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public List<GrantedAuthority> extractAuthorities(String token) {
+        // 1. Extract all claims from the JWT string
+        Claims claims = extractAllClaims(token);
+
+        // 2. Fetch the roles array (e.g. ["ROLE_USER", "ROLE_ADMIN"]) out of the token
+        // payload
+        List<String> roles = claims.get("roles", List.class);
+
+        // 3. Map string names directly into Spring Security GrantedAuthority instances
+        // (In-Memory!)
+        return roles.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
     }
 }
